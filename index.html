@@ -577,7 +577,8 @@
 
     </div>
 
-    <script>
+    <!-- MAIN APP SCRIPT WITH ES MODULE SUPPORT -->
+    <script type="module">
         const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
         createApp({
@@ -589,10 +590,30 @@
 
                 let supabase = null;
 
-                // Initialize Supabase directly from Environment Variables
+                // Safely read environment variables across static ESM and build tooling
+                const getEnvVar = (key) => {
+                    try {
+                        if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
+                            return import.meta.env[key];
+                        }
+                    } catch (e) {}
+                    try {
+                        if (typeof process !== 'undefined' && process.env && process.env[key]) {
+                            return process.env[key];
+                        }
+                    } catch (e) {}
+                    try {
+                        if (window && window[key]) {
+                            return window[key];
+                        }
+                    } catch (e) {}
+                    return '';
+                };
+
                 const initSupabase = () => {
-                    const url = window.VITE_SUPABASE_URL || (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_URL) || localStorage.getItem('neko_sb_url') || '';
-                    const key = window.VITE_SUPABASE_ANON_KEY || (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_ANON_KEY) || localStorage.getItem('neko_sb_key') || '';
+                    const url = getEnvVar('VITE_SUPABASE_URL');
+                    const key = getEnvVar('VITE_SUPABASE_ANON_KEY');
+                    
                     if (window.supabase && url && key) {
                         try {
                             supabase = window.supabase.createClient(url, key);
@@ -714,7 +735,7 @@
                 const showTaskModal = ref(false);
                 const isEditing = ref(false);
                 const currentEditingId = ref(null);
-                taskForm = ref({ title: '', description: '', category: '🐱 Personal', priority: 'Normal ⚡', due_date: '' });
+                const taskForm = ref({ title: '', description: '', category: '🐱 Personal', priority: 'Normal ⚡', due_date: '' });
 
                 const showAuthModal = ref(false);
                 const authMode = ref('signin');
@@ -775,18 +796,6 @@
                     } finally {
                         loading.value = false;
                         refreshIcons();
-                    }
-                };
-
-                // Save Supabase Config
-                const saveSupabaseConfig = () => {
-                    localStorage.setItem('neko_sb_url', configForm.value.url.trim());
-                    localStorage.setItem('neko_sb_key', configForm.value.key.trim());
-                    if (initSupabase()) {
-                        showConfigModal.value = false;
-                        checkSession();
-                    } else {
-                        alert('Could not initialize Supabase with those credentials.');
                     }
                 };
 
@@ -1014,7 +1023,7 @@
 
                 const handleAuth = async () => {
                     if (!supabase) {
-                        authError.value = 'Supabase client is not connected. Click the settings icon to add your keys.';
+                        authError.value = 'Supabase environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY) are missing in your Vercel settings.';
                         return;
                     }
 
