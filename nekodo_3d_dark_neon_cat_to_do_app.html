@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NekoDo 🐾 3D Dark Neon Cat To-Do App</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Tone.js for Cute Synthesized Sound Effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        neko: {
+                            bg: '#0B0F19',
+                            card: '#151C2C',
+                            cardBorder: '#232D42',
+                            pink: '#FF2A85',
+                            purple: '#9D4EDD',
+                            cyan: '#00F5FF',
+                            mint: '#00FF9F',
+                            yellow: '#FFD000',
+                            orange: '#FF6B00'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'neon-pink': '0 0 20px -3px rgba(255, 42, 133, 0.4)',
+                        'neon-cyan': '0 0 20px -3px rgba(0, 245, 255, 0.4)',
+                        'neon-purple': '0 0 20px -3px rgba(157, 78, 221, 0.4)',
+                        'glow-lg': '0 0 35px -5px rgba(255, 42, 133, 0.3)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0B0F19;
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(255, 42, 133, 0.12) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(157, 78, 221, 0.15) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(0, 245, 255, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #F3F4F6;
+            overflow-x: hidden;
+        }
+
+        /* 3D Perspective Card Wrapper */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .tilt-card {
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+            transform-style: preserve-3d;
+        }
+
+        .tilt-card:hover {
+            transform: translateY(-6px) rotateX(2deg) rotateY(-2deg);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0F19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #232D42;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FF2A85;
+        }
+
+        /* Cat Animation Keyframes */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+        }
+        .animate-float {
+            animation: floatSlow 4s ease-in-out infinite;
+        }
+
+        @keyframes heartFloat {
+            0% { transform: translateY(0px) scale(0.6); opacity: 1; }
+            100% { transform: translateY(-40px) scale(1.3) rotate(15deg); opacity: 0; }
+        }
+        .heart-particle {
+            animation: heartFloat 0.8s ease-out forwards;
+        }
+
+        @keyframes catBounce {
+            0%, 100% { transform: scale(1); }
+            30% { transform: scale(1.18) rotate(-4deg); }
+            60% { transform: scale(0.92) rotate(3deg); }
+            80% { transform: scale(1.05); }
+        }
+        .animate-cat-meow {
+            animation: catBounce 0.5s ease-in-out;
+        }
+
+        @keyframes tailWag {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(18deg); }
+        }
+        .animate-tail {
+            transform-origin: bottom left;
+            animation: tailWag 1.8s ease-in-out infinite;
+        }
+        .animate-tail {
+            transform-origin: bottom left;
+            animation: tailWag 2s ease-in-out infinite;
+        }
+
+        @keyframes earTwitch {
+            0%, 90%, 100% { transform: rotate(0deg); }
+            93% { transform: rotate(-8deg); }
+            96% { transform: rotate(4deg); }
+        }
+        .animate-ear-left {
+            transform-origin: bottom right;
+            animation: earTwitch 5s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.6; filter: blur(20px); }
+            50% { opacity: 0.9; filter: blur(30px); }
+        }
+        .animate-glow {
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        /* Task Transitions */
+        .task-list-enter-active,
+        .task-list-leave-active {
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .task-list-enter-from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+        }
+        .task-list-leave-to {
+            opacity: 0;
+            transform: translateX(40px) scale(0.9);
+        }
+        .task-list-move {
+            transition: transform 0.4s ease;
+        }
+
+        /* Paw particle animation */
+        @keyframes pawPop {
+            0% { transform: scale(0) rotate(0deg); opacity: 1; }
+            100% { transform: scale(1.8) rotate(20deg); opacity: 0; }
+        }
+        .paw-particle {
+            animation: pawPop 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100 antialiased pb-16">
+
+    <div id="app" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+
+        <!-- HEADER BAR WITH NEON LOGO & AUTH -->
+        <header class="relative z-10 bg-neko-card/80 backdrop-blur-xl rounded-3xl p-4 sm:p-6 mb-8 border border-neko-cardBorder shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <!-- 3D Mascot Logo Icon -->
+                <div class="relative group cursor-pointer" @mouseenter="catHover = true" @mouseleave="catHover = false">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-neko-pink via-neko-purple to-neko-cyan rounded-2xl animate-glow opacity-80"></div>
+                    <div class="relative w-14 h-14 rounded-2xl bg-neko-bg border border-neko-cardBorder flex items-center justify-center text-3xl shadow-inner transform group-hover:scale-110 transition-transform duration-300">
+                        🐾
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-display font-black text-2xl sm:text-3xl text-white tracking-wider flex items-center gap-2">
+                        Neko<span class="text-transparent bg-clip-text bg-gradient-to-r from-neko-pink via-neko-purple to-neko-cyan">Do 🐾</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-neko-pink/20 text-neko-pink border border-neko-pink/40 shadow-neon-pink">NEON 3D</span>
+                    </h1>
+                    <p class="text-xs text-slate-400 font-medium">Cyberpunk Pastel Task Companion with 3D Purr Power</p>
+                </div>
+            </div>
+
+            <!-- User Auth & Controls -->
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                
+                <button @click="toggleSound" 
+                    :class="[
+                        'px-3 py-2 rounded-2xl border text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm',
+                        soundEnabled ? 'bg-neko-pink/20 text-neko-pink border-neko-pink/40 shadow-neon-pink' : 'bg-neko-bg text-slate-500 border-neko-cardBorder'
+                    ]" :title="soundEnabled ? 'Mute Cute Sounds' : 'Enable Cute Sounds'">
+                    <i data-lucide="volume-2" v-if="soundEnabled" class="w-4 h-4"></i>
+                    <i data-lucide="volume-x" v-else class="w-4 h-4"></i>
+                    <span>{{ soundEnabled ? 'Audio ON 🎵' : 'Muted 🔇' }}</span>
+                </button>
+
+                <template v-if="currentUser">
+                    <div class="flex items-center gap-3 bg-neko-bg/90 px-4 py-2 rounded-2xl border border-neko-cardBorder">
+                        <div class="relative">
+                            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-neko-pink to-neko-purple flex items-center justify-center text-white font-black text-sm shadow-neon-pink">
+                                {{ currentUser.name.charAt(0).toUpperCase() }}
+                            </div>
+                            <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-neko-mint border-2 border-neko-bg rounded-full"></span>
+                        </div>
+                        <div class="text-left hidden md:block">
+                            <p class="text-xs font-bold text-white leading-tight">{{ currentUser.name }}</p>
+                            <p class="text-[10px] text-slate-400 font-mono">{{ currentUser.email }}</p>
+                        </div>
+                        <button @click="logout" class="ml-2 p-2 text-slate-400 hover:text-neko-pink hover:bg-neko-pink/10 rounded-xl transition-colors" title="Log Out">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </template>
+                <template v-else>
+                    <button @click="openAuthModal('signin')" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-neko-pink to-neko-purple text-white font-bold text-xs uppercase tracking-wider shadow-neon-pink hover:opacity-95 transition-all transform active:scale-95 flex items-center gap-2">
+                        <i data-lucide="user" class="w-4 h-4"></i> Access Account
+                    </button>
+                </template>
+
+                <button @click="showSetupModal = true" class="p-2.5 rounded-2xl bg-neko-card hover:bg-neko-cardBorder border border-neko-cardBorder text-neko-cyan hover:text-white transition-all shadow-sm" title="Supabase & Vercel Setup">
+                    <i data-lucide="database" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="space-y-8">
+
+            <!-- 3D CAT MASCOT HERO BANNER -->
+            <div class="relative bg-gradient-to-r from-neko-card via-neko-card to-neko-bg rounded-3xl p-6 sm:p-8 border border-neko-cardBorder shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                
+                <!-- Background Neon Glow Balls -->
+                <div class="absolute -top-10 -right-10 w-48 h-48 bg-neko-pink/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-neko-cyan/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                <!-- Left Column: 3D Animated SVG Cat Companion -->
+                <div class="md:col-span-5 flex flex-col items-center justify-center relative min-h-[230px]">
+                    <div class="animate-float relative group cursor-pointer" @click="handleCatClick($event)" @mouseenter="catHover = true" @mouseleave="catHover = false">
+                        
+                        <!-- Dynamic Aura based on Cat Mood -->
+                        <div class="absolute inset-0 rounded-full blur-2xl transition-all duration-500" 
+                             :class="{
+                                 'bg-neko-pink/40': catMood.type === 'purrfect',
+                                 'bg-neko-cyan/40': catMood.type === 'playful',
+                                 'bg-neko-purple/40': catMood.type === 'curious',
+                                 'bg-slate-700/20': catMood.type === 'napping'
+                             }"></div>
+
+                        <!-- Sparkle Floating Badges -->
+                        <div class="absolute -top-2 -right-2 bg-neko-pink text-white text-[10px] font-black px-2 py-0.5 rounded-full border border-white/20 shadow-neon-pink z-20 animate-bounce">
+                            CLICK ME! 🐾
+                        </div>
+
+                        <!-- SVG 3D Animated Extra Cute Cat -->
+                        <svg :class="['w-52 h-52 relative z-10 drop-shadow-[0_18px_20px_rgba(0,0,0,0.65)] transition-transform', isMeowing ? 'animate-cat-meow' : '']" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Fluffy Tail with Neon Tip -->
+                            <path class="animate-tail" d="M140 145C165 145 182 120 176 90C172 72 150 78 153 96C156 110 142 128 128 128" stroke="#252F48" stroke-width="14" stroke-linecap="round" />
+                            <path class="animate-tail" d="M140 145C165 145 182 120 176 90C172 72 150 78 153 96C156 110 142 128 128 128" stroke="#FF2A85" stroke-width="5" stroke-linecap="round" />
+
+                            <!-- Cat Body / Torso (Soft Dark Metallic 3D) -->
+                            <ellipse cx="100" cy="142" rx="46" ry="36" fill="url(#catBodyGrad)" />
+
+                            <!-- Cute Paws Peeking over Front with Pink Toe Beans! -->
+                            <g class="transition-transform group-hover:-translate-y-1">
+                                <!-- Left Paw -->
+                                <ellipse cx="74" cy="166" rx="14" ry="10" fill="#252F48" stroke="#FF2A85" stroke-width="1.5" />
+                                <ellipse cx="74" cy="168" rx="6" ry="4" fill="#FF2A85" />
+                                <circle cx="68" cy="163" r="2" fill="#FF2A85" />
+                                <circle cx="74" cy="161" r="2" fill="#FF2A85" />
+                                <circle cx="80" cy="163" r="2" fill="#FF2A85" />
+
+                                <!-- Right Paw -->
+                                <ellipse cx="126" cy="166" rx="14" ry="10" fill="#252F48" stroke="#00F5FF" stroke-width="1.5" />
+                                <ellipse cx="126" cy="168" rx="6" ry="4" fill="#00F5FF" />
+                                <circle cx="120" cy="163" r="2" fill="#00F5FF" />
+                                <circle cx="126" cy="161" r="2" fill="#00F5FF" />
+                                <circle cx="132" cy="163" r="2" fill="#00F5FF" />
+                            </g>
+
+                            <!-- Collar & Golden Bell -->
+                            <path d="M68 122 C 100 136, 130 136, 132 122" stroke="#FF2A85" stroke-width="7" stroke-linecap="round" />
+                            <circle cx="100" cy="131" r="7" fill="#FFD000" class="animate-ping opacity-70" />
+                            <circle cx="100" cy="131" r="6" fill="#FFD000" stroke="#FFF" stroke-width="1" />
+
+                            <!-- Head Shell -->
+                            <circle cx="100" cy="82" r="42" fill="url(#catHeadGrad)" stroke="#2D3A56" stroke-width="2" />
+
+                            <!-- Ears with Cute Pink Inner Fluff -->
+                            <g class="animate-ear-left">
+                                <path d="M65 58 L44 22 L82 46 Z" fill="#182030" stroke="#FF2A85" stroke-width="2.5" />
+                                <path d="M65 54 L50 28 L78 45 Z" fill="url(#earPinkGrad)" />
+                            </g>
+                            <g>
+                                <path d="M135 58 L156 22 L118 46 Z" fill="#182030" stroke="#00F5FF" stroke-width="2.5" />
+                                <path d="M135 54 L150 28 L122 45 Z" fill="url(#earCyanGrad)" />
+                            </g>
+
+                            <!-- Cute Glowing Pink Blush Cheeks -->
+                            <ellipse cx="68" cy="94" rx="9" ry="5" fill="#FF2A85" opacity="0.6" filter="blur(1px)" />
+                            <ellipse cx="132" cy="94" rx="9" ry="5" fill="#FF2A85" opacity="0.6" filter="blur(1px)" />
+
+                            <!-- Dynamic Extra Cute Eyes -->
+                            <!-- 100% Completed Heart Eyes 😍 -->
+                            <g v-if="catMood.type === 'purrfect'">
+                                <text x="64" y="93" fill="#FF2A85" font-size="22">💖</text>
+                                <text x="114" y="93" fill="#FF2A85" font-size="22">💖</text>
+                            </g>
+                            <!-- Napping Eyes 😴 -->
+                            <g v-else-if="catMood.type === 'napping'">
+                                <path d="M74 84 Q82 92 90 84" stroke="#00F5FF" stroke-width="3.5" stroke-linecap="round" fill="none" />
+                                <path d="M110 84 Q118 92 126 84" stroke="#00F5FF" stroke-width="3.5" stroke-linecap="round" fill="none" />
+                            </g>
+                            <!-- Big Anime Glossy Eyes with Sparkles ✨ -->
+                            <g v-else>
+                                <!-- Eye Backing -->
+                                <circle cx="80" cy="82" r="10" fill="#0B0F19" />
+                                <circle cx="120" cy="82" r="10" fill="#0B0F19" />
+                                
+                                <!-- Iris Neon Colors -->
+                                <circle cx="80" cy="82" r="8.5" fill="url(#eyeCyanGrad)" />
+                                <circle cx="120" cy="82" r="8.5" fill="url(#eyePinkGrad)" />
+
+                                <!-- Shiny Anime Light Highlights -->
+                                <circle cx="77" cy="79" r="3.5" fill="#FFFFFF" />
+                                <circle cx="83" cy="85" r="1.8" fill="#FFFFFF" />
+                                <circle cx="117" cy="79" r="3.5" fill="#FFFFFF" />
+                                <circle cx="123" cy="85" r="1.8" fill="#FFFFFF" />
+                            </g>
+
+                            <!-- Nose & Mouth -->
+                            <polygon points="97,91 103,91 100,95" fill="#FF2A85" />
+                            <!-- Meowing Mouth when Clicked -->
+                            <path v-if="isMeowing" d="M95 96 C 98 104, 102 104, 105 96 Z" fill="#FF2A85" stroke="#FFF" stroke-width="1" />
+                            <path v-else d="M95 96 Q100 101 100 96 Q100 101 105 96" stroke="#E2E8F0" stroke-width="2.2" stroke-linecap="round" fill="none" />
+                            
+                            <!-- Whiskers -->
+                            <line x1="50" y1="88" x2="68" y2="90" stroke="#00F5FF" stroke-width="1.8" stroke-linecap="round" opacity="0.8" />
+                            <line x1="47" y1="96" x2="68" y2="95" stroke="#00F5FF" stroke-width="1.8" stroke-linecap="round" opacity="0.8" />
+                            <line x1="150" y1="88" x2="132" y2="90" stroke="#FF2A85" stroke-width="1.8" stroke-linecap="round" opacity="0.8" />
+                            <line x1="153" y1="96" x2="132" y2="95" stroke="#FF2A85" stroke-width="1.8" stroke-linecap="round" opacity="0.8" />
+
+                            <!-- Gradients -->
+                            <defs>
+                                <radialGradient id="catHeadGrad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(100 82) rotate(90) scale(42)">
+                                    <stop offset="0%" stop-color="#28334A" />
+                                    <stop offset="100%" stop-color="#121824" />
+                                </radialGradient>
+                                <radialGradient id="catBodyGrad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(100 142) rotate(90) scale(46 36)">
+                                    <stop offset="0%" stop-color="#28334A" />
+                                    <stop offset="100%" stop-color="#0E131F" />
+                                </radialGradient>
+                                <linearGradient id="earPinkGrad" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#FF2A85" />
+                                    <stop offset="100%" stop-color="#9D4EDD" />
+                                </linearGradient>
+                                <linearGradient id="earCyanGrad" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#00F5FF" />
+                                    <stop offset="100%" stop-color="#00FF9F" />
+                                </linearGradient>
+                                <linearGradient id="eyeCyanGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#00F5FF" />
+                                    <stop offset="100%" stop-color="#0088FF" />
+                                </linearGradient>
+                                <linearGradient id="eyePinkGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#FF2A85" />
+                                    <stop offset="100%" stop-color="#9D4EDD" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <!-- Mood Speech Bubble -->
+                    <div class="mt-2 bg-neko-bg/90 border border-neko-cardBorder px-4 py-1.5 rounded-2xl shadow-lg flex items-center gap-2 transform hover:scale-105 transition-transform">
+                        <span class="text-xs font-bold text-white">{{ catMood.badge }}</span>
+                        <span class="text-[11px] text-neko-cyan font-mono">{{ catMood.quote }}</span>
+                    </div>
+                </div>
+
+                <!-- Right Column: Stats & Progress Bar -->
+                <div class="md:col-span-7 space-y-5">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs uppercase font-bold tracking-widest text-slate-400">Purrfect Completion Rate</span>
+                            <span class="text-3xl font-black font-display text-transparent bg-clip-text bg-gradient-to-r from-neko-pink to-neko-cyan">{{ completionPercentage }}%</span>
+                        </div>
+                        <!-- Neon 3D Progress Track -->
+                        <div class="w-full bg-neko-bg h-4 rounded-full p-1 border border-neko-cardBorder shadow-inner overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-neko-pink via-neko-purple to-neko-cyan rounded-full transition-all duration-700 shadow-neon-pink" :style="{ width: completionPercentage + '%' }"></div>
+                        </div>
+                    </div>
+
+                    <!-- 3D Stat Badges -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="tilt-card bg-neko-bg/80 rounded-2xl p-3.5 border border-neko-cardBorder text-center">
+                            <p class="text-xs font-bold text-slate-400">Total Tasks</p>
+                            <p class="text-2xl font-black font-display text-white mt-1">{{ totalCount }}</p>
+                        </div>
+                        <div class="tilt-card bg-neko-bg/80 rounded-2xl p-3.5 border border-neko-mint/30 text-center">
+                            <p class="text-xs font-bold text-neko-mint">Completed</p>
+                            <p class="text-2xl font-black font-display text-neko-mint mt-1">{{ completedCount }}</p>
+                        </div>
+                        <div class="tilt-card bg-neko-bg/80 rounded-2xl p-3.5 border border-neko-pink/30 text-center">
+                            <p class="text-xs font-bold text-neko-pink">Urgent 🔥</p>
+                            <p class="text-2xl font-black font-display text-neko-pink mt-1">{{ urgentCount }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-neko-card/90 backdrop-blur-xl rounded-3xl p-5 border border-neko-cardBorder shadow-xl space-y-4">
+                <div class="flex flex-col lg:flex-row gap-4 items-center justify-between">
+                    
+                    <!-- Search Input -->
+                    <div class="relative w-full lg:w-80">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input v-model="searchQuery" type="text" placeholder="Search tasks or cat keywords..." class="w-full pl-11 pr-4 py-3 rounded-2xl bg-neko-bg border border-neko-cardBorder text-sm text-white placeholder-slate-500 focus:outline-none focus:border-neko-pink focus:ring-1 focus:ring-neko-pink transition-all">
+                        <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">✕</button>
+                    </div>
+
+                    <!-- Status Tabs -->
+                    <div class="flex bg-neko-bg p-1 rounded-2xl w-full lg:w-auto border border-neko-cardBorder text-xs font-bold">
+                        <button v-for="status in ['All', 'Active', 'Completed']" :key="status" 
+                            @click="filterStatus = status"
+                            :class="[
+                                'flex-1 lg:flex-initial px-5 py-2 rounded-xl transition-all',
+                                filterStatus === status ? 'bg-gradient-to-r from-neko-pink to-neko-purple text-white shadow-neon-pink' : 'text-slate-400 hover:text-white'
+                            ]">
+                            {{ status }}
+                        </button>
+                    </div>
+
+                    <!-- Add Task Primary CTA -->
+                    <button @click="openTaskModal()" class="w-full lg:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-neko-pink via-neko-purple to-neko-cyan text-white font-extrabold text-sm uppercase tracking-wider shadow-neon-pink hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="plus" class="w-5 h-5"></i> Add New Task 🐾
+                    </button>
+                </div>
+
+                <!-- Secondary Filter Bar (Categories & Priorities) -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-neko-cardBorder/60 text-xs">
+                    
+                    <!-- Category Chips -->
+                    <div class="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0">
+                        <span class="text-slate-500 font-bold uppercase tracking-wider text-[10px] mr-1">Categories:</span>
+                        <button v-for="cat in categories" :key="cat.name"
+                            @click="selectedCategory = cat.name"
+                            :class="[
+                                'px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all border',
+                                selectedCategory === cat.name ? 'bg-neko-pink/20 text-neko-pink border-neko-pink shadow-neon-pink' : 'bg-neko-bg text-slate-400 border-neko-cardBorder hover:border-slate-600'
+                            ]">
+                            {{ cat.icon }} {{ cat.name }}
+                        </button>
+                    </div>
+
+                    <!-- Priority Dropdown -->
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <span class="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Priority:</span>
+                        <select v-model="filterPriority" class="bg-neko-bg border border-neko-cardBorder text-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold focus:outline-none focus:border-neko-cyan">
+                            <option value="All">All Priorities</option>
+                            <option value="Urgent 🔥">Urgent 🔥</option>
+                            <option value="Normal ⚡">Normal ⚡</option>
+                            <option value="Chill 🌸">Chill 🌸</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4 perspective-1000">
+                <transition-group name="task-list">
+                    <div v-for="task in filteredTasks" :key="task.id" 
+                        :class="[
+                            'tilt-card bg-neko-card rounded-3xl p-5 border shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden',
+                            task.completed ? 'opacity-60 border-neko-cardBorder bg-neko-bg/50' : 'border-neko-cardBorder hover:border-neko-pink/50'
+                        ]">
+                        
+                        <!-- Accent Border Glow -->
+                        <div v-if="!task.completed" class="absolute left-0 top-0 bottom-0 w-1.5" 
+                             :class="{
+                                 'bg-neko-pink shadow-neon-pink': task.priority === 'Urgent 🔥',
+                                 'bg-neko-yellow': task.priority === 'Normal ⚡',
+                                 'bg-neko-mint': task.priority === 'Chill 🌸'
+                             }"></div>
+
+                        <div class="flex items-start gap-4 pl-2 w-full sm:w-auto">
+                            <!-- Custom Interactive Paw Checkbox -->
+                            <button @click="toggleTaskComplete(task, $event)" 
+                                :class="[
+                                    'mt-1 w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all flex-shrink-0 shadow-sm',
+                                    task.completed ? 'bg-neko-mint border-neko-mint text-neko-bg font-black scale-105' : 'border-slate-600 hover:border-neko-pink bg-neko-bg'
+                                ]">
+                                <span v-if="task.completed" class="text-xs">🐾</span>
+                            </button>
+
+                            <!-- Task Main Details -->
+                            <div class="space-y-1.5">
+                                <h4 :class="['font-display font-bold text-base sm:text-lg text-white leading-snug', task.completed ? 'line-through text-slate-500' : '']">
+                                    {{ task.title }}
+                                </h4>
+                                <p v-if="task.description" :class="['text-xs text-slate-400 max-w-xl', task.completed ? 'line-through text-slate-600' : '']">
+                                    {{ task.description }}
+                                </p>
+
+                                <!-- Meta Badges -->
+                                <div class="flex flex-wrap items-center gap-2 pt-1">
+                                    <!-- Category -->
+                                    <span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-lg bg-neko-bg border border-neko-cardBorder text-neko-cyan">
+                                        {{ getCategoryIcon(task.category) }} {{ task.category }}
+                                    </span>
+
+                                    <!-- Priority -->
+                                    <span :class="['text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-lg border', getPriorityBadgeStyle(task.priority)]">
+                                        {{ task.priority }}
+                                    </span>
+
+                                    <!-- Due Date -->
+                                    <span v-if="task.dueDate" :class="['text-[11px] font-mono flex items-center gap-1', isOverdue(task.dueDate) && !task.completed ? 'text-neko-pink font-bold' : 'text-slate-500']">
+                                        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                                        {{ formatDate(task.dueDate) }}
+                                        <span v-if="isOverdue(task.dueDate) && !task.completed" class="text-[9px] uppercase px-1.5 py-0.2 rounded bg-neko-pink/20 text-neko-pink font-bold border border-neko-pink/40">OVERDUE</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex items-center gap-2 self-end sm:self-center">
+                            <button @click="openTaskModal(task)" class="p-2.5 text-slate-400 hover:text-white hover:bg-neko-cardBorder rounded-xl transition-colors" title="Edit Task">
+                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                            </button>
+                            <button @click="deleteTask(task.id)" class="p-2.5 text-slate-400 hover:text-neko-pink hover:bg-neko-pink/10 rounded-xl transition-colors" title="Delete Task">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </transition-group>
+
+                <!-- Empty State -->
+                <div v-if="filteredTasks.length === 0" class="bg-neko-card/40 rounded-3xl p-12 text-center border border-dashed border-neko-cardBorder">
+                    <div class="w-16 h-16 bg-neko-bg text-neko-cyan rounded-2xl border border-neko-cardBorder flex items-center justify-center mx-auto mb-3 text-3xl">
+                        🧶
+                    </div>
+                    <h3 class="font-display font-bold text-white text-lg">No tasks found in this realm</h3>
+                    <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Create a new task or adjust your filters to let your 3D Neko companion play!</p>
+                    <button @click="resetFilters" class="mt-4 px-4 py-2 bg-neko-cardBorder text-neko-cyan rounded-xl text-xs font-bold hover:bg-neko-card transition-colors">
+                        Clear All Filters
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <div v-if="showTaskModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="bg-neko-card rounded-3xl max-w-md w-full p-6 border border-neko-cardBorder shadow-2xl relative">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-display font-bold text-xl text-white flex items-center gap-2">
+                        {{ isEditing ? 'Edit Task ✏️' : 'Create Task 🐾' }}
+                    </h3>
+                    <button @click="showTaskModal = false" class="text-slate-400 hover:text-white text-sm">✕</button>
+                </div>
+
+                <form @submit.prevent="saveTask" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Task Title *</label>
+                        <input v-model="taskForm.title" type="text" required placeholder="e.g. Feed midnight salmon treats 🐟" class="w-full px-4 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-sm text-white focus:outline-none focus:border-neko-pink">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Description</label>
+                        <textarea v-model="taskForm.description" rows="2" placeholder="Optional notes or details..." class="w-full px-4 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-sm text-white focus:outline-none focus:border-neko-pink"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Category</label>
+                            <select v-model="taskForm.category" class="w-full px-3 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-xs font-bold text-white focus:outline-none focus:border-neko-pink">
+                                <option v-for="cat in categories.filter(c => c.name !== 'All')" :key="cat.name" :value="cat.name">
+                                    {{ cat.icon }} {{ cat.name }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Priority</label>
+                            <select v-model="taskForm.priority" class="w-full px-3 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-xs font-bold text-white focus:outline-none focus:border-neko-pink">
+                                <option value="Chill 🌸">Chill 🌸</option>
+                                <option value="Normal ⚡">Normal ⚡</option>
+                                <option value="Urgent 🔥">Urgent 🔥</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Due Date</label>
+                        <input v-model="taskForm.dueDate" type="date" class="w-full px-4 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-xs font-mono text-white focus:outline-none focus:border-neko-pink">
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-4 border-t border-neko-cardBorder">
+                        <button type="button" @click="showTaskModal = false" class="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-neko-cardBorder transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-neko-pink to-neko-purple text-white font-extrabold text-xs uppercase tracking-wider shadow-neon-pink">
+                            {{ isEditing ? 'Save Changes' : 'Create Task' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div v-if="showAuthModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="bg-neko-card rounded-3xl max-w-sm w-full p-6 border border-neko-cardBorder shadow-2xl">
+                <div class="flex justify-between items-center mb-5">
+                    <h3 class="font-display font-bold text-xl text-white">
+                        {{ authMode === 'signin' ? 'Sign In 🐾' : authMode === 'signup' ? 'Create Account 🎀' : 'Reset Password 🔑' }}
+                    </h3>
+                    <button @click="showAuthModal = false" class="text-slate-400 hover:text-white">✕</button>
+                </div>
+
+                <form @submit.prevent="handleAuth" class="space-y-3">
+                    <div v-if="authMode === 'signup'">
+                        <label class="block text-xs font-bold text-slate-400 mb-1">Full Name</label>
+                        <input v-model="authForm.name" type="text" required class="w-full px-3.5 py-2 rounded-xl bg-neko-bg border border-neko-cardBorder text-sm text-white focus:outline-none focus:border-neko-cyan">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-1">Email Address</label>
+                        <input v-model="authForm.email" type="email" required class="w-full px-3.5 py-2 rounded-xl bg-neko-bg border border-neko-cardBorder text-sm text-white focus:outline-none focus:border-neko-cyan">
+                    </div>
+
+                    <div v-if="authMode !== 'reset'">
+                        <label class="block text-xs font-bold text-slate-400 mb-1">Password</label>
+                        <input v-model="authForm.password" type="password" required class="w-full px-3.5 py-2 rounded-xl bg-neko-bg border border-neko-cardBorder text-sm text-white focus:outline-none focus:border-neko-cyan">
+                    </div>
+
+                    <button type="submit" class="w-full py-2.5 mt-2 rounded-xl bg-gradient-to-r from-neko-pink to-neko-purple text-white font-extrabold text-xs uppercase tracking-wider shadow-neon-pink">
+                        {{ authMode === 'signin' ? 'Sign In' : authMode === 'signup' ? 'Register Account' : 'Send Reset Link' }}
+                    </button>
+                </form>
+
+                <div class="mt-4 pt-3 border-t border-neko-cardBorder text-center text-xs text-slate-400 space-y-1">
+                    <template v-if="authMode === 'signin'">
+                        <p>No account? <a @click.prevent="authMode = 'signup'" href="#" class="text-neko-pink font-bold hover:underline">Sign Up</a></p>
+                        <p><a @click.prevent="authMode = 'reset'" href="#" class="text-slate-500 hover:underline">Forgot password?</a></p>
+                    </template>
+                    <template v-else-if="authMode === 'signup'">
+                        <p>Already registered? <a @click.prevent="authMode = 'signin'" href="#" class="text-neko-pink font-bold hover:underline">Sign In</a></p>
+                    </template>
+                    <template v-else>
+                        <p><a @click.prevent="authMode = 'signin'" href="#" class="text-neko-pink font-bold hover:underline">Back to Sign In</a></p>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showSetupModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="bg-neko-card rounded-3xl max-w-2xl w-full p-6 border border-neko-cardBorder shadow-2xl max-h-[85vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-display font-bold text-xl text-white flex items-center gap-2">
+                        <i data-lucide="database" class="text-neko-cyan"></i> Supabase & Vercel Deployment Setup
+                    </h3>
+                    <button @click="showSetupModal = false" class="text-slate-400 hover:text-white">✕</button>
+                </div>
+
+                <div class="space-y-4 text-xs text-slate-300">
+                    <p class="text-slate-400">Follow these instructions to connect your Supabase PostgreSQL database with Row Level Security (RLS) and deploy to Vercel:</p>
+                    
+                    <div>
+                        <h4 class="font-bold text-neko-pink mb-1 uppercase tracking-wider">1. Supabase SQL Schema & Row Level Security Policies</h4>
+                        <pre class="bg-neko-bg p-4 rounded-xl border border-neko-cardBorder text-neko-mint font-mono overflow-x-auto text-[11px] leading-relaxed">
+-- Create Tasks Table
+CREATE TABLE public.tasks (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  category TEXT DEFAULT '🐱 Personal',
+  priority TEXT DEFAULT 'Normal ⚡',
+  due_date DATE,
+  completed BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS Security
+ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
+
+-- Security Policies (Ensure users read & change ONLY their own tasks)
+CREATE POLICY "Select own tasks" ON public.tasks FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Insert own tasks" ON public.tasks FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Update own tasks" ON public.tasks FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Delete own tasks" ON public.tasks FOR DELETE USING (auth.uid() = user_id);
+                        </pre>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-neko-cyan mb-1 uppercase tracking-wider">2. Vercel Environment Variables</h4>
+                        <div class="bg-neko-bg p-3 rounded-xl border border-neko-cardBorder font-mono text-[11px] space-y-1">
+                            <p class="text-neko-pink">VITE_SUPABASE_URL = <span class="text-slate-400">https://your-project.supabase.co</span></p>
+                            <p class="text-neko-pink">VITE_SUPABASE_ANON_KEY = <span class="text-slate-400">eyJhbGciOiJIUzI1NiIsIn...</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <button @click="showSetupModal = false" class="px-5 py-2 rounded-xl bg-neko-cardBorder text-white text-xs font-bold hover:bg-slate-700">Close Instructions</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted, nextTick } = Vue;
+
+        createApp({
+            setup() {
+                // Audio Synthesizers & Sound Engine
+                const soundEnabled = ref(true);
+                const isMeowing = ref(false);
+
+                // Audio Context Initializer
+                const initAudio = async () => {
+                    if (window.Tone && Tone.context.state !== 'running') {
+                        await Tone.start();
+                    }
+                };
+
+                // Cute Synthesized Sounds (No external sound files required)
+                const playMeowSound = async () => {
+                    if (!soundEnabled.value || !window.Tone) return;
+                    await initAudio();
+                    try {
+                        const synth = new Tone.Synth({
+                            oscillator: { type: 'sine' },
+                            envelope: { attack: 0.05, decay: 0.2, sustain: 0.3, release: 0.3 }
+                        }).toDestination();
+                        synth.volume.value = -4;
+
+                        const now = Tone.now();
+                        synth.triggerAttackRelease('E5', '0.35', now);
+                        synth.frequency.exponentialRampTo('A5', 0.15, now);
+                        synth.frequency.exponentialRampTo('F#5', 0.3, now + 0.15);
+                    } catch(e) { console.log('Audio play error:', e); }
+                };
+
+                const playSparkleCompleteSound = async () => {
+                    if (!soundEnabled.value || !window.Tone) return;
+                    await initAudio();
+                    try {
+                        const poly = new Tone.PolySynth(Tone.Synth, {
+                            oscillator: { type: 'triangle' },
+                            envelope: { attack: 0.01, decay: 0.25, sustain: 0.1, release: 0.3 }
+                        }).toDestination();
+                        poly.volume.value = -6;
+
+                        const now = Tone.now();
+                        ['C5', 'E5', 'G5', 'B5', 'C6'].forEach((note, i) => {
+                            poly.triggerAttackRelease(note, '8n', now + i * 0.06);
+                        });
+                    } catch(e) {}
+                };
+
+                const playPopSound = async () => {
+                    if (!soundEnabled.value || !window.Tone) return;
+                    await initAudio();
+                    try {
+                        const mem = new Tone.MembraneSynth({
+                            pitchDecay: 0.05,
+                            octaves: 3,
+                            oscillator: { type: 'sine' },
+                            envelope: { attack: 0.001, decay: 0.12, sustain: 0, release: 0.08 }
+                        }).toDestination();
+                        mem.volume.value = -8;
+                        mem.triggerAttackRelease('C4', '16n');
+                    } catch(e) {}
+                };
+
+                const playDeleteSound = async () => {
+                    if (!soundEnabled.value || !window.Tone) return;
+                    await initAudio();
+                    try {
+                        const synth = new Tone.Synth({
+                            oscillator: { type: 'sine' },
+                            envelope: { attack: 0.01, decay: 0.15, sustain: 0, release: 0.1 }
+                        }).toDestination();
+                        synth.volume.value = -8;
+                        const now = Tone.now();
+                        synth.triggerAttackRelease('G4', '16n', now);
+                        synth.frequency.exponentialRampTo('C4', 0.1, now);
+                    } catch(e) {}
+                };
+
+                const toggleSound = () => {
+                    soundEnabled.value = !soundEnabled.value;
+                    if (soundEnabled.value) playPopSound();
+                };
+
+                // Click Cat Mascot Reaction
+                const handleCatClick = (event) => {
+                    isMeowing.value = true;
+                    playMeowSound();
+
+                    // Heart Sparkle Particle Burst
+                    if (event) {
+                        for (let i = 0; i < 4; i++) {
+                            const heart = document.createElement('div');
+                            heart.className = 'heart-particle fixed z-50 text-xl pointer-events-none';
+                            heart.innerText = ['💖', '🐾', '✨', '🌸'][i % 4];
+                            heart.style.left = `${event.clientX + (Math.random() * 40 - 20)}px`;
+                            heart.style.top = `${event.clientY + (Math.random() * 20 - 10)}px`;
+                            document.body.appendChild(heart);
+                            setTimeout(() => heart.remove(), 800);
+                        }
+                    }
+
+                    setTimeout(() => {
+                        isMeowing.value = false;
+                    }, 500);
+                };
+
+                // Initial Sample Tasks
+                const defaultTasks = [
+                    { id: '1', title: 'Feed salmon feast to Neko 🐟', description: 'Give 2 spoons of wet food', category: '🐱 Personal', priority: 'Urgent 🔥', dueDate: '2026-09-30', completed: false },
+                    { id: '2', title: 'Finish 3D Dark Neon App UI 💻', description: 'Complete Vue 3 composition & CSS tilt cards', category: '🐾 Work', priority: 'Urgent 🔥', dueDate: '2026-09-29', completed: true },
+                    { id: '3', title: 'Buy catnip & yarn ball 🧶', description: 'Get purple soft yarn from shop', category: '🧶 Hobbies', priority: 'Normal ⚡', dueDate: '2026-10-02', completed: false }
+                ];
+
+                // Reactive State
+                const tasks = ref(JSON.parse(localStorage.getItem('nekodo_tasks')) || defaultTasks);
+                const currentUser = ref(JSON.parse(localStorage.getItem('nekodo_user')) || { name: 'KuroNeko 🐾', email: 'kuro@neko.app' });
+                
+                const searchQuery = ref('');
+                const filterStatus = ref('All');
+                const selectedCategory = ref('All');
+                const filterPriority = ref('All');
+                const catHover = ref(false);
+
+                // Modals
+                const showTaskModal = ref(false);
+                const isEditing = ref(false);
+                const currentEditingId = ref(null);
+                const taskForm = ref({ title: '', description: '', category: '🐱 Personal', priority: 'Normal ⚡', dueDate: '' });
+
+                const showAuthModal = ref(false);
+                const authMode = ref('signin');
+                const authForm = ref({ name: '', email: '', password: '' });
+                const showSetupModal = ref(false);
+
+                // Categories
+                const categories = [
+                    { name: 'All', icon: '✨' },
+                    { name: '🐾 Work', icon: '💼' },
+                    { name: '🐱 Personal', icon: '🌸' },
+                    { name: '🐟 Shopping', icon: '🛒' },
+                    { name: '🧶 Hobbies', icon: '🎮' }
+                ];
+
+                // Sync LocalStorage
+                const syncStorage = () => {
+                    localStorage.setItem('nekodo_tasks', JSON.stringify(tasks.value));
+                };
+
+                const refreshIcons = () => {
+                    nextTick(() => {
+                        if (window.lucide) window.lucide.createIcons();
+                    });
+                };
+
+                onMounted(() => {
+                    refreshIcons();
+                });
+
+                // Computed Stats
+                const totalCount = computed(() => tasks.value.length);
+                const completedCount = computed(() => tasks.value.filter(t => t.completed).length);
+                const urgentCount = computed(() => tasks.value.filter(t => t.priority === 'Urgent 🔥' && !t.completed).length);
+                
+                const completionPercentage = computed(() => {
+                    if (totalCount.value === 0) return 0;
+                    return Math.round((completedCount.value / totalCount.value) * 100);
+                });
+
+                // Cat Mascot Reaction Mood
+                const catMood = computed(() => {
+                    if (catHover.value) {
+                        return { type: 'curious', badge: 'Curious 😼', quote: 'Purrr... inspecting your task!' };
+                    }
+                    const pct = completionPercentage.value;
+                    if (pct === 100 && totalCount.value > 0) {
+                        return { type: 'purrfect', badge: 'Super Purrfect 🌟🐱', quote: 'Nya! All tasks complete!' };
+                    } else if (pct >= 50) {
+                        return { type: 'playful', badge: 'Playful Cat 🐾', quote: 'You are doing awesome!' };
+                    } else if (pct > 0) {
+                        return { type: 'curious', badge: 'Curious Cat 😼', quote: 'Keep up the purr power!' };
+                    }
+                    return { type: 'napping', badge: 'Napping Cat 😴', quote: 'Zzz... waiting for tasks!' };
+                });
+
+                // Filter Logic
+                const filteredTasks = computed(() => {
+                    return tasks.value.filter(task => {
+                        const matchesSearch = task.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                            (task.description && task.description.toLowerCase().includes(searchQuery.value.toLowerCase()));
+                        
+                        const matchesStatus = filterStatus.value === 'All' ? true :
+                            filterStatus.value === 'Active' ? !task.completed : task.completed;
+
+                        const matchesCategory = selectedCategory.value === 'All' ? true :
+                            task.category === selectedCategory.value;
+
+                        const matchesPriority = filterPriority.value === 'All' ? true :
+                            task.priority === filterPriority.value;
+
+                        return matchesSearch && matchesStatus && matchesCategory && matchesPriority;
+                    });
+                });
+
+                // Task Operations with Audio Hooks
+                const toggleTaskComplete = (task, event) => {
+                    task.completed = !task.completed;
+                    syncStorage();
+                    refreshIcons();
+
+                    if (task.completed) {
+                        playSparkleCompleteSound();
+                    } else {
+                        playPopSound();
+                    }
+
+                    // Create Paw Particle Burst Effect on Click
+                    if (task.completed && event) {
+                        const paw = document.createElement('div');
+                        paw.className = 'paw-particle fixed z-50 text-2xl pointer-events-none';
+                        paw.innerText = '🐾';
+                        paw.style.left = `${event.clientX - 10}px`;
+                        paw.style.top = `${event.clientY - 10}px`;
+                        document.body.appendChild(paw);
+                        setTimeout(() => paw.remove(), 600);
+                    }
+                };
+
+                const openTaskModal = (task = null) => {
+                    playPopSound();
+                    if (task) {
+                        isEditing.value = true;
+                        currentEditingId.value = task.id;
+                        taskForm.value = { ...task };
+                    } else {
+                        isEditing.value = false;
+                        currentEditingId.value = null;
+                        taskForm.value = { title: '', description: '', category: '🐱 Personal', priority: 'Normal ⚡', dueDate: '' };
+                    }
+                    showTaskModal.value = true;
+                    refreshIcons();
+                };
+
+                const saveTask = () => {
+                    if (!taskForm.value.title.trim()) return;
+
+                    if (isEditing.value) {
+                        const index = tasks.value.findIndex(t => t.id === currentEditingId.value);
+                        if (index !== -1) tasks.value[index] = { ...tasks.value[index], ...taskForm.value };
+                    } else {
+                        tasks.value.unshift({
+                            id: Date.now().toString(),
+                            ...taskForm.value,
+                            completed: false
+                        });
+                    }
+
+                    playPopSound();
+                    syncStorage();
+                    showTaskModal.value = false;
+                    refreshIcons();
+                };
+
+                const deleteTask = (id) => {
+                    playDeleteSound();
+                    tasks.value = tasks.value.filter(t => t.id !== id);
+                    syncStorage();
+                    refreshIcons();
+                };
+
+                const resetFilters = () => {
+                    searchQuery.value = '';
+                    filterStatus.value = 'All';
+                    selectedCategory.value = 'All';
+                    filterPriority.value = 'All';
+                };
+
+                // Styling Helpers
+                const getCategoryIcon = (category) => {
+                    const found = categories.find(c => c.name === category);
+                    return found ? found.icon : '🏷️';
+                };
+
+                const getPriorityBadgeStyle = (priority) => {
+                    switch(priority) {
+                        case 'Urgent 🔥': return 'bg-neko-pink/20 text-neko-pink border-neko-pink/40 shadow-neon-pink';
+                        case 'Normal ⚡': return 'bg-neko-yellow/20 text-neko-yellow border-neko-yellow/40';
+                        case 'Chill 🌸': return 'bg-neko-mint/20 text-neko-mint border-neko-mint/40';
+                        default: return 'bg-slate-800 text-slate-400 border-slate-700';
+                    }
+                };
+
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return '';
+                    const d = new Date(dateStr);
+                    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                };
+
+                const isOverdue = (dateStr) => {
+                    if (!dateStr) return false;
+                    const today = new Date().setHours(0, 0, 0, 0);
+                    const due = new Date(dateStr).setHours(0, 0, 0, 0);
+                    return due < today;
+                };
+
+                // Auth Operations
+                const openAuthModal = (mode) => {
+                    authMode.value = mode;
+                    authForm.value = { name: '', email: '', password: '' };
+                    showAuthModal.value = true;
+                };
+
+                const handleAuth = () => {
+                    if (authMode.value === 'signup') {
+                        currentUser.value = { name: authForm.value.name, email: authForm.value.email };
+                    } else if (authMode.value === 'signin') {
+                        currentUser.value = { name: authForm.value.email.split('@')[0], email: authForm.value.email };
+                    }
+                    localStorage.setItem('nekodo_user', JSON.stringify(currentUser.value));
+                    showAuthModal.value = false;
+                    refreshIcons();
+                };
+
+                const logout = () => {
+                    currentUser.value = null;
+                    localStorage.removeItem('nekodo_user');
+                    refreshIcons();
+                };
+
+                return {
+                    tasks,
+                    currentUser,
+                    searchQuery,
+                    filterStatus,
+                    selectedCategory,
+                    filterPriority,
+                    catHover,
+                    soundEnabled,
+                    isMeowing,
+                    toggleSound,
+                    handleCatClick,
+                    showTaskModal,
+                    isEditing,
+                    taskForm,
+                    showAuthModal,
+                    authMode,
+                    authForm,
+                    showSetupModal,
+                    categories,
+                    totalCount,
+                    completedCount,
+                    urgentCount,
+                    completionPercentage,
+                    catMood,
+                    filteredTasks,
+                    toggleTaskComplete,
+                    openTaskModal,
+                    saveTask,
+                    deleteTask,
+                    resetFilters,
+                    getCategoryIcon,
+                    getPriorityBadgeStyle,
+                    formatDate,
+                    isOverdue,
+                    openAuthModal,
+                    handleAuth,
+                    logout
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
