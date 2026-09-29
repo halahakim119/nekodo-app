@@ -581,6 +581,10 @@
     <script type="module">
         const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
+        // Embedded Supabase Project Defaults (Extracted from Anon Token)
+        const DEFAULT_SUPABASE_URL = 'https://djpkykmzhnvblzpofazo.supabase.co';
+        const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqcGt5a216aG52Ymx6cG9mYXpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2OTkxMzEsImV4cCI6MjEwNjI3NTEzMX0.ld01V4yfiF0VFlQWmexnT5u1eVA9JYkdR4UiFq8-a7I';
+
         createApp({
             setup() {
                 const soundEnabled = ref(true);
@@ -590,7 +594,7 @@
 
                 let supabase = null;
 
-                // Safely read environment variables across static ESM and build tooling
+                // Safely read environment variables across static ESM and build tooling with embedded fallbacks
                 const getEnvVar = (key) => {
                     try {
                         if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
@@ -607,6 +611,9 @@
                             return window[key];
                         }
                     } catch (e) {}
+
+                    if (key === 'VITE_SUPABASE_URL') return DEFAULT_SUPABASE_URL;
+                    if (key === 'VITE_SUPABASE_ANON_KEY') return DEFAULT_SUPABASE_ANON_KEY;
                     return '';
                 };
 
@@ -1023,7 +1030,7 @@
 
                 const handleAuth = async () => {
                     if (!supabase) {
-                        authError.value = 'Supabase environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY) are missing in your Vercel settings.';
+                        authError.value = 'Supabase client is not initialized. Please check your project settings.';
                         return;
                     }
 
