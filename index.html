@@ -189,10 +189,6 @@
                     </span>
                 </button>
 
-                <button @click="showConfigModal = true" class="p-2.5 rounded-2xl bg-neko-bg hover:bg-neko-cardBorder border border-neko-cardBorder text-neko-cyan hover:text-white transition-all shadow-sm" title="Database Settings">
-                    <i data-lucide="settings" class="w-4 h-4"></i>
-                </button>
-
                 <template v-if="currentUser">
                     <div class="flex items-center gap-3 bg-neko-bg/90 px-4 py-2 rounded-2xl border border-neko-cardBorder">
                         <div class="relative">
@@ -579,41 +575,6 @@
             </div>
         </div>
 
-        <!-- DATABASE CONFIGURATION MODAL -->
-        <div v-if="showConfigModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-            <div class="bg-neko-card rounded-3xl max-w-md w-full p-6 border border-neko-cardBorder shadow-2xl relative">
-                <div class="flex justify-between items-center mb-5">
-                    <h3 class="font-display font-bold text-xl text-white flex items-center gap-2">
-                        ⚙️ Supabase Keys Setup
-                    </h3>
-                    <button @click="showConfigModal = false" class="text-slate-400 hover:text-white">✕</button>
-                </div>
-
-                <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                    Paste your Supabase API keys here to connect your app. These keys will be saved in your browser's local storage.
-                </p>
-
-                <form @submit.prevent="saveSupabaseConfig" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-1">Project URL</label>
-                        <input v-model="configForm.url" type="url" required placeholder="https://xyzcompany.supabase.co" class="w-full px-3.5 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-xs text-white font-mono focus:outline-none focus:border-neko-cyan">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-1">Anon / Public Key</label>
-                        <input v-model="configForm.key" type="text" required placeholder="eyJhbGciOiJIUzI1NiIsIn..." class="w-full px-3.5 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-xs text-white font-mono focus:outline-none focus:border-neko-cyan">
-                    </div>
-
-                    <div class="flex justify-end gap-3 pt-2">
-                        <button type="button" @click="showConfigModal = false" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white">Cancel</button>
-                        <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-neko-pink to-neko-purple text-white font-extrabold text-xs uppercase tracking-wider shadow-neon-pink">
-                            Connect Database
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
     </div>
 
     <script>
@@ -626,18 +587,13 @@
                 const loading = ref(false);
                 const saving = ref(false);
 
-                // Supabase Connection State
-                const configForm = ref({
-                    url: localStorage.getItem('neko_sb_url') || window.VITE_SUPABASE_URL || '',
-                    key: localStorage.getItem('neko_sb_key') || window.VITE_SUPABASE_ANON_KEY || ''
-                });
-
                 let supabase = null;
 
+                // Initialize Supabase directly from Environment Variables
                 const initSupabase = () => {
-                    const url = configForm.value.url;
-                    const key = configForm.value.key;
-                    if (window.supabase && url && url !== 'YOUR_SUPABASE_URL' && key && key !== 'YOUR_SUPABASE_ANON_KEY') {
+                    const url = window.VITE_SUPABASE_URL || (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_URL) || localStorage.getItem('neko_sb_url') || '';
+                    const key = window.VITE_SUPABASE_ANON_KEY || (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_ANON_KEY) || localStorage.getItem('neko_sb_key') || '';
+                    if (window.supabase && url && key) {
                         try {
                             supabase = window.supabase.createClient(url, key);
                             return true;
@@ -758,10 +714,9 @@
                 const showTaskModal = ref(false);
                 const isEditing = ref(false);
                 const currentEditingId = ref(null);
-                const taskForm = ref({ title: '', description: '', category: '🐱 Personal', priority: 'Normal ⚡', due_date: '' });
+                taskForm = ref({ title: '', description: '', category: '🐱 Personal', priority: 'Normal ⚡', due_date: '' });
 
                 const showAuthModal = ref(false);
-                const showConfigModal = ref(false);
                 const authMode = ref('signin');
                 const authForm = ref({ name: '', email: '', password: '' });
                 const authLoading = ref(false);
@@ -1044,10 +999,6 @@
 
                 // Auth Operations
                 const openAuthModal = (mode) => {
-                    if (!supabase) {
-                        showConfigModal.value = true;
-                        return;
-                    }
                     authMode.value = mode;
                     authError.value = '';
                     authSuccess.value = '';
@@ -1118,7 +1069,7 @@
                     searchQuery, filterStatus, selectedCategory, filterPriority, catHover,
                     soundEnabled, isMeowing, toggleSound, handleCatClick,
                     showTaskModal, isEditing, taskForm, openTaskModal, saveTask, deleteTask, resetFilters,
-                    showAuthModal, showConfigModal, configForm, saveSupabaseConfig, isSupabaseConfigured,
+                    showAuthModal, isSupabaseConfigured,
                     authMode, authForm, authLoading, authError, authSuccess, authModalTitle, authSubmitLabel,
                     openAuthModal, switchAuthMode, handleAuth, logout,
                     userName, userInitial,
