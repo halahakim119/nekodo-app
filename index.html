@@ -156,30 +156,44 @@
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-100 antialiased pb-16">
+<body class="min-h-screen text-slate-100 antialiased pb-12 sm:pb-16">
 
-    <div id="app" v-cloak class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <div id="app" v-cloak class="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6">
 
-        <!-- HEADER BAR WITH LOGO & AUTH CONTROL -->
-        <header class="relative z-10 bg-neko-card/80 backdrop-blur-xl rounded-3xl p-4 sm:p-6 mb-8 border border-neko-cardBorder shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
-                <div class="relative group cursor-pointer" @mouseenter="catHover = true" @mouseleave="catHover = false">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-neko-pink via-neko-purple to-neko-cyan rounded-2xl animate-glow opacity-80"></div>
-                    <div class="relative w-14 h-14 rounded-2xl bg-neko-bg border border-neko-cardBorder flex items-center justify-center text-3xl shadow-inner transform group-hover:scale-105 transition-transform duration-300">
-                        🐾
+        <!-- HEADER BAR WITH LOGO & CONTROLS -->
+        <header class="relative z-10 bg-neko-card/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-3 sm:p-6 mb-6 sm:mb-8 border border-neko-cardBorder shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 sm:gap-4 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex items-center gap-3">
+                    <div class="relative group cursor-pointer" @mouseenter="catHover = true" @mouseleave="catHover = false">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-neko-pink via-neko-purple to-neko-cyan rounded-2xl animate-glow opacity-80"></div>
+                        <div class="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-neko-bg border border-neko-cardBorder flex items-center justify-center text-2xl sm:text-3xl shadow-inner transform group-hover:scale-105 transition-transform duration-300">
+                            🐾
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="font-display font-black text-xl sm:text-2xl lg:text-3xl text-white tracking-wider flex items-center gap-2">
+                            Neko<span class="text-transparent bg-clip-text bg-gradient-to-r from-neko-pink via-neko-purple to-neko-cyan">Do 🐾</span>
+                        </h1>
                     </div>
                 </div>
-                <div>
-                    <h1 class="font-display font-black text-2xl sm:text-3xl text-white tracking-wider flex items-center gap-2">
-                        Neko<span class="text-transparent bg-clip-text bg-gradient-to-r from-neko-pink via-neko-purple to-neko-cyan">Do 🐾</span>
-                    </h1>
+
+                <!-- Mobile Audio Toggle Switch Button -->
+                <div class="flex sm:hidden items-center gap-2">
+                    <button @click="toggleSound" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-neko-bg border border-neko-cardBorder">
+                        <div :class="['w-8 h-4 rounded-full p-0.5 transition-colors relative flex items-center', soundEnabled ? 'bg-neko-pink' : 'bg-slate-700']">
+                            <div :class="['w-3.5 h-3.5 rounded-full bg-white transition-transform shadow-md', soundEnabled ? 'translate-x-4' : 'translate-x-0']"></div>
+                        </div>
+                        <span class="text-[10px] font-bold" :class="soundEnabled ? 'text-neko-pink' : 'text-slate-500'">
+                            {{ soundEnabled ? 'ON' : 'OFF' }}
+                        </span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Controls & User Info -->
-            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                <!-- Audio Toggle Switch -->
-                <button @click="toggleSound" class="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-neko-bg border border-neko-cardBorder hover:border-neko-pink/40 transition-all shadow-sm">
+            <!-- Controls & User Info for Desktop -->
+            <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
+                <!-- Desktop Audio Toggle Switch -->
+                <button @click="toggleSound" class="hidden sm:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-neko-bg border border-neko-cardBorder hover:border-neko-pink/40 transition-all shadow-sm">
                     <span class="text-xs font-bold text-slate-400">Audio</span>
                     <div :class="['w-9 h-5 rounded-full p-0.5 transition-colors relative flex items-center', soundEnabled ? 'bg-neko-pink' : 'bg-slate-700']">
                         <div :class="['w-4 h-4 rounded-full bg-white transition-transform shadow-md', soundEnabled ? 'translate-x-4' : 'translate-x-0']"></div>
@@ -190,61 +204,61 @@
                 </button>
 
                 <template v-if="currentUser">
-                    <div class="flex items-center gap-3 bg-neko-bg/90 px-4 py-2 rounded-2xl border border-neko-cardBorder">
-                        <div class="relative">
-                            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-neko-pink to-neko-purple flex items-center justify-center text-white font-black text-sm shadow-neon-pink">
-                                {{ userInitial }}
+                    <div class="flex items-center gap-2 sm:gap-3 bg-neko-bg/90 px-3 sm:px-4 py-2 rounded-2xl border border-neko-cardBorder w-full sm:w-auto justify-between sm:justify-start">
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <div class="relative">
+                                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-neko-pink to-neko-purple flex items-center justify-center text-white font-black text-xs sm:text-sm shadow-neon-pink">
+                                    {{ userInitial }}
+                                </div>
+                                <span class="absolute -bottom-1 -right-1 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-neko-mint border-2 border-neko-bg rounded-full"></span>
                             </div>
-                            <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-neko-mint border-2 border-neko-bg rounded-full"></span>
+                            <div class="text-left max-w-[120px] sm:max-w-none truncate">
+                                <p class="text-xs font-bold text-white leading-tight truncate">{{ userName }}</p>
+                                <p class="text-[10px] text-slate-400 font-mono truncate">{{ currentUser.email }}</p>
+                            </div>
                         </div>
-                        <div class="text-left hidden md:block">
-                            <p class="text-xs font-bold text-white leading-tight">{{ userName }}</p>
-                            <p class="text-[10px] text-slate-400 font-mono">{{ currentUser.email }}</p>
-                        </div>
-                        <button @click="logout" class="ml-2 p-2 text-slate-400 hover:text-neko-pink hover:bg-neko-pink/10 rounded-xl transition-colors" title="Log Out">
+                        <button @click="logout" class="p-2 text-slate-400 hover:text-neko-pink hover:bg-neko-pink/10 rounded-xl transition-colors" title="Log Out">
                             <i data-lucide="log-out" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </template>
                 <template v-else>
-                    <button @click="openAuthModal('signin')" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-neko-pink to-neko-purple text-white font-bold text-xs uppercase tracking-wider shadow-neon-pink hover:opacity-95 transition-all flex items-center gap-2">
+                    <button @click="openAuthModal('signin')" class="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-2xl bg-gradient-to-r from-neko-pink to-neko-purple text-white font-bold text-xs uppercase tracking-wider shadow-neon-pink hover:opacity-95 transition-all flex items-center justify-center gap-2">
                         <i data-lucide="user" class="w-4 h-4"></i> Sign In
                     </button>
                 </template>
             </div>
         </header>
 
-        <!-- SIMPLE & CLEAN UNAUTHENTICATED WELCOME BANNER -->
-        <div v-if="!currentUser && !loading" class="bg-neko-card border border-neko-cardBorder rounded-3xl p-8 sm:p-12 text-center my-12 shadow-2xl space-y-6 max-w-xl mx-auto">
-            <div class="w-20 h-20 mx-auto rounded-3xl bg-neko-bg border border-neko-cardBorder flex items-center justify-center text-4xl shadow-inner">
+        <div v-if="!currentUser && !loading" class="bg-neko-card border border-neko-cardBorder rounded-3xl p-6 sm:p-12 text-center my-8 sm:my-12 shadow-2xl space-y-6 max-w-lg mx-auto">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-3xl bg-neko-bg border border-neko-cardBorder flex items-center justify-center text-3xl sm:text-4xl shadow-inner">
                 🔒
             </div>
             <div class="space-y-2">
-                <h2 class="font-display font-extrabold text-2xl text-white">Welcome to NekoDo 🐾</h2>
-                <p class="text-sm text-slate-400">Please sign in or create an account to start managing your private tasks securely.</p>
+                <h2 class="font-display font-extrabold text-xl sm:text-2xl text-white">Welcome to NekoDo 🐾</h2>
+                <p class="text-xs sm:text-sm text-slate-400">Please sign in or create an account to start managing your private tasks securely.</p>
             </div>
 
-            <div class="flex items-center justify-center gap-4 pt-2">
-                <button @click="openAuthModal('signin')" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-neko-pink to-neko-purple text-white font-extrabold text-xs uppercase tracking-wider shadow-neon-pink hover:scale-105 transition-all">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2">
+                <button @click="openAuthModal('signin')" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-neko-pink to-neko-purple text-white font-extrabold text-xs uppercase tracking-wider shadow-neon-pink hover:scale-105 transition-all">
                     Sign In
                 </button>
-                <button @click="openAuthModal('signup')" class="px-6 py-3 rounded-2xl bg-neko-bg border border-neko-cardBorder text-neko-cyan font-extrabold text-xs uppercase tracking-wider hover:border-neko-cyan transition-all">
+                <button @click="openAuthModal('signup')" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-neko-bg border border-neko-cardBorder text-neko-cyan font-extrabold text-xs uppercase tracking-wider hover:border-neko-cyan transition-all">
                     Create Account
                 </button>
             </div>
         </div>
 
-        <!-- MAIN APP CONTENT (ONLY WHEN LOGGED IN) -->
-        <main v-if="currentUser" class="space-y-8">
+        <main v-if="currentUser" class="space-y-6 sm:space-y-8">
 
-            <!-- NEON OUTLINE CAT HERO BANNER (NO EARS, NO LEGS, ROUND CIRCLE WITH TAIL & WHISKERS) -->
-            <div class="relative bg-gradient-to-r from-neko-card via-neko-card to-neko-bg rounded-3xl p-6 sm:p-8 border border-neko-cardBorder shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            <!-- MINIMALIST CIRCLE CAT MASCOT HERO BANNER (NO EARS, NO LEGS, WITH WHISKERS & TAIL) -->
+            <div class="relative bg-gradient-to-r from-neko-card via-neko-card to-neko-bg rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-neko-cardBorder shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                 
-                <div class="absolute -top-10 -right-10 w-56 h-56 bg-neko-cyan/15 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute -bottom-10 -left-10 w-56 h-56 bg-neko-pink/15 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -top-10 -right-10 w-48 sm:w-56 h-48 sm:h-56 bg-neko-cyan/15 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-10 -left-10 w-48 sm:w-56 h-48 sm:h-56 bg-neko-pink/15 rounded-full blur-3xl pointer-events-none"></div>
 
                 <!-- Left Column: Minimalist Circle Cat Mascot (No Ears, No Legs) -->
-                <div class="md:col-span-5 flex flex-col items-center justify-center relative min-h-[220px]">
+                <div class="md:col-span-5 flex flex-col items-center justify-center relative min-h-[190px] sm:min-h-[220px]">
                     <div class="animate-float relative group cursor-pointer" @click="handleCatClick($event)" @mouseenter="catHover = true" @mouseleave="catHover = false">
                         
                         <div class="absolute inset-0 rounded-full blur-2xl opacity-40 transition-all duration-500" 
@@ -255,12 +269,12 @@
                                  'bg-slate-700': catMood.type === 'napping'
                              }"></div>
 
-                        <div class="absolute -top-1 -right-1 bg-gradient-to-r from-neko-cyan to-neko-pink text-white text-[10px] font-black px-2.5 py-0.5 rounded-full border border-white/20 shadow-neon-cyan z-20 animate-bounce">
+                        <div class="absolute -top-1 -right-1 bg-gradient-to-r from-neko-cyan to-neko-pink text-white text-[9px] sm:text-[10px] font-black px-2.5 py-0.5 rounded-full border border-white/20 shadow-neon-cyan z-20 animate-bounce">
                             PET ME! 🐾
                         </div>
 
-                        <!-- 2D NEON OUTLINE CIRCLE CAT SVG (NO EARS, NO LEGS) -->
-                        <svg :class="['w-52 h-52 relative z-10 filter drop-shadow-[0_0_12px_rgba(0,245,255,0.6)] transition-transform', isMeowing ? 'animate-cat-meow' : '']" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- 2D CIRCLE CAT SVG (NO EARS, NO LEGS, ONLY CIRCLE, EYES, WHISKERS, TAIL) -->
+                        <svg :class="['w-40 h-40 sm:w-52 sm:h-52 relative z-10 filter drop-shadow-[0_0_12px_rgba(0,245,255,0.6)] transition-transform', isMeowing ? 'animate-cat-meow' : '']" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                             
                             <!-- Tail -->
                             <path class="animate-tail" d="M 145 150 C 175 145 185 110 165 92 C 150 80 140 100 152 115" stroke="#00F5FF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
@@ -292,48 +306,47 @@
                         </svg>
                     </div>
 
-                    <div class="mt-2 bg-neko-bg/90 border border-neko-cardBorder px-4 py-1.5 rounded-2xl shadow-lg flex items-center gap-2">
-                        <span class="text-xs font-bold text-white">{{ catMood.badge }}</span>
-                        <span class="text-[11px] text-neko-cyan font-mono">{{ catMood.quote }}</span>
+                    <div class="mt-2 bg-neko-bg/90 border border-neko-cardBorder px-3 sm:px-4 py-1.5 rounded-2xl shadow-lg flex items-center gap-2">
+                        <span class="text-[11px] sm:text-xs font-bold text-white">{{ catMood.badge }}</span>
+                        <span class="text-[10px] sm:text-[11px] text-neko-cyan font-mono">{{ catMood.quote }}</span>
                     </div>
                 </div>
 
                 <!-- Right Column: Task Progress & Statistics -->
-                <div class="md:col-span-7 space-y-5">
+                <div class="md:col-span-7 space-y-4 sm:space-y-5">
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs uppercase font-bold tracking-widest text-slate-400">Completion Rate</span>
-                            <span class="text-3xl font-black font-display text-transparent bg-clip-text bg-gradient-to-r from-neko-pink to-neko-cyan">{{ completionPercentage }}%</span>
+                            <span class="text-[11px] sm:text-xs uppercase font-bold tracking-widest text-slate-400">Completion Rate</span>
+                            <span class="text-2xl sm:text-3xl font-black font-display text-transparent bg-clip-text bg-gradient-to-r from-neko-pink to-neko-cyan">{{ completionPercentage }}%</span>
                         </div>
-                        <div class="w-full bg-neko-bg h-4 rounded-full p-1 border border-neko-cardBorder shadow-inner overflow-hidden">
+                        <div class="w-full bg-neko-bg h-3.5 sm:h-4 rounded-full p-1 border border-neko-cardBorder shadow-inner overflow-hidden">
                             <div class="h-full bg-gradient-to-r from-neko-pink via-neko-purple to-neko-cyan rounded-full transition-all duration-700 shadow-neon-pink" :style="{ width: completionPercentage + '%' }"></div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-3">
-                        <div class="tilt-card bg-neko-bg/80 rounded-2xl p-3.5 border border-neko-cardBorder text-center">
-                            <p class="text-xs font-bold text-slate-400">Total Tasks</p>
-                            <p class="text-2xl font-black font-display text-white mt-1">{{ totalCount }}</p>
+                    <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                        <div class="tilt-card bg-neko-bg/80 rounded-2xl p-3 border border-neko-cardBorder text-center">
+                            <p class="text-[11px] sm:text-xs font-bold text-slate-400">Total</p>
+                            <p class="text-xl sm:text-2xl font-black font-display text-white mt-1">{{ totalCount }}</p>
                         </div>
-                        <div class="tilt-card bg-neko-bg/80 rounded-2xl p-3.5 border border-neko-mint/30 text-center">
-                            <p class="text-xs font-bold text-neko-mint">Completed</p>
-                            <p class="text-2xl font-black font-display text-neko-mint mt-1">{{ completedCount }}</p>
+                        <div class="tilt-card bg-neko-bg/80 rounded-2xl p-3 border border-neko-mint/30 text-center">
+                            <p class="text-[11px] sm:text-xs font-bold text-neko-mint">Completed</p>
+                            <p class="text-xl sm:text-2xl font-black font-display text-neko-mint mt-1">{{ completedCount }}</p>
                         </div>
-                        <div class="tilt-card bg-neko-bg/80 rounded-2xl p-3.5 border border-neko-pink/30 text-center">
-                            <p class="text-xs font-bold text-neko-pink">Urgent 🔥</p>
-                            <p class="text-2xl font-black font-display text-neko-pink mt-1">{{ urgentCount }}</p>
+                        <div class="tilt-card bg-neko-bg/80 rounded-2xl p-3 border border-neko-pink/30 text-center">
+                            <p class="text-[11px] sm:text-xs font-bold text-neko-pink">Urgent 🔥</p>
+                            <p class="text-xl sm:text-2xl font-black font-display text-neko-pink mt-1">{{ urgentCount }}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- CONTROLS & FILTER BAR -->
-            <div class="bg-neko-card/90 backdrop-blur-xl rounded-3xl p-5 border border-neko-cardBorder shadow-xl space-y-4">
-                <div class="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            <div class="bg-neko-card/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-neko-cardBorder shadow-xl space-y-4">
+                <div class="flex flex-col lg:flex-row gap-3 sm:gap-4 items-center justify-between">
                     
                     <div class="relative w-full lg:w-80">
                         <i data-lucide="search" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input v-model="searchQuery" type="text" placeholder="Search your tasks..." class="w-full pl-11 pr-4 py-3 rounded-2xl bg-neko-bg border border-neko-cardBorder text-sm text-white placeholder-slate-500 focus:outline-none focus:border-neko-pink transition-all">
+                        <input v-model="searchQuery" type="text" placeholder="Search your tasks..." class="w-full pl-11 pr-4 py-3 rounded-2xl bg-neko-bg border border-neko-cardBorder text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-neko-pink transition-all">
                         <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">✕</button>
                     </div>
 
@@ -341,32 +354,32 @@
                         <button v-for="status in ['All', 'Active', 'Completed']" :key="status" 
                             @click="filterStatus = status"
                             :class="[
-                                'flex-1 lg:flex-initial px-5 py-2 rounded-xl transition-all',
+                                'flex-1 lg:flex-initial px-4 sm:px-5 py-2 rounded-xl transition-all',
                                 filterStatus === status ? 'bg-gradient-to-r from-neko-pink to-neko-purple text-white shadow-neon-pink' : 'text-slate-400 hover:text-white'
                             ]">
                             {{ status }}
                         </button>
                     </div>
 
-                    <button @click="openTaskModal()" class="w-full lg:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-neko-pink via-neko-purple to-neko-cyan text-white font-extrabold text-sm uppercase tracking-wider shadow-neon-pink hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <button @click="openTaskModal()" class="w-full lg:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-neko-pink via-neko-purple to-neko-cyan text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider shadow-neon-pink hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
                         <i data-lucide="plus" class="w-5 h-5"></i> Add New Task 🐾
                     </button>
                 </div>
 
-                <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-neko-cardBorder/60 text-xs">
-                    <div class="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0">
-                        <span class="text-slate-500 font-bold uppercase tracking-wider text-[10px] mr-1">Categories:</span>
+                <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-3 pt-3 border-t border-neko-cardBorder/60 text-xs">
+                    <div class="flex items-center gap-2 overflow-x-auto w-full pb-1 sm:pb-0">
+                        <span class="text-slate-500 font-bold uppercase tracking-wider text-[10px] mr-1 flex-shrink-0">Categories:</span>
                         <button v-for="cat in categories" :key="cat.name"
                             @click="selectedCategory = cat.name"
                             :class="[
-                                'px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all border',
+                                'px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all border text-[11px] sm:text-xs',
                                 selectedCategory === cat.name ? 'bg-neko-pink/20 text-neko-pink border-neko-pink shadow-neon-pink' : 'bg-neko-bg text-slate-400 border-neko-cardBorder hover:border-slate-600'
                             ]">
                             {{ cat.icon }} {{ cat.name }}
                         </button>
                     </div>
 
-                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
                         <span class="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Priority:</span>
                         <select v-model="filterPriority" class="bg-neko-bg border border-neko-cardBorder text-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold focus:outline-none focus:border-neko-cyan">
                             <option value="All">All Priorities</option>
@@ -378,7 +391,6 @@
                 </div>
             </div>
 
-            <!-- TASK LISTING SECTION -->
             <div class="space-y-4">
                 <div v-if="loading" class="text-center py-12">
                     <div class="w-10 h-10 border-4 border-neko-pink border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
@@ -389,7 +401,7 @@
                     <transition-group name="task-list">
                         <div v-for="task in filteredTasks" :key="task.id" 
                             :class="[
-                                'tilt-card bg-neko-card rounded-3xl p-5 border shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden',
+                                'tilt-card bg-neko-card rounded-2xl sm:rounded-3xl p-4 sm:p-5 border shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden',
                                 task.completed ? 'opacity-60 border-neko-cardBorder bg-neko-bg/50' : 'border-neko-cardBorder hover:border-neko-pink/50'
                             ]">
                             
@@ -400,7 +412,7 @@
                                      'bg-neko-mint': task.priority === 'Chill 🌸'
                                  }"></div>
 
-                            <div class="flex items-start gap-4 pl-2 w-full sm:w-auto">
+                            <div class="flex items-start gap-3 sm:gap-4 pl-1 sm:pl-2 w-full sm:w-auto">
                                 <button @click="toggleTaskComplete(task, $event)" 
                                     :class="[
                                         'mt-1 w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all flex-shrink-0 shadow-sm',
@@ -409,15 +421,15 @@
                                     <span v-if="task.completed" class="text-xs">🐾</span>
                                 </button>
 
-                                <div class="space-y-1.5">
-                                    <h4 :class="['font-display font-bold text-base sm:text-lg text-white leading-snug', task.completed ? 'line-through text-slate-500' : '']">
+                                <div class="space-y-1.5 w-full">
+                                    <h4 :class="['font-display font-bold text-sm sm:text-base lg:text-lg text-white leading-snug', task.completed ? 'line-through text-slate-500' : '']">
                                         {{ task.title }}
                                     </h4>
                                     <p v-if="task.description" :class="['text-xs text-slate-400 max-w-xl', task.completed ? 'line-through text-slate-600' : '']">
                                         {{ task.description }}
                                     </p>
 
-                                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                                    <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-1">
                                         <span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-lg bg-neko-bg border border-neko-cardBorder text-neko-cyan">
                                             {{ getCategoryIcon(task.category) }} {{ task.category }}
                                         </span>
@@ -446,11 +458,11 @@
                         </div>
                     </transition-group>
 
-                    <div v-if="filteredTasks.length === 0" class="bg-neko-card/40 rounded-3xl p-12 text-center border border-dashed border-neko-cardBorder">
+                    <div v-if="filteredTasks.length === 0" class="bg-neko-card/40 rounded-3xl p-8 sm:p-12 text-center border border-dashed border-neko-cardBorder">
                         <div class="w-16 h-16 bg-neko-bg text-neko-cyan rounded-2xl border border-neko-cardBorder flex items-center justify-center mx-auto mb-3 text-3xl">
                             🧶
                         </div>
-                        <h3 class="font-display font-bold text-white text-lg">No tasks found</h3>
+                        <h3 class="font-display font-bold text-white text-base sm:text-lg">No tasks found</h3>
                         <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Create your first task above to start getting things done!</p>
                         <button v-if="searchQuery || filterStatus !== 'All' || selectedCategory !== 'All' || filterPriority !== 'All'" @click="resetFilters" class="mt-4 px-4 py-2 bg-neko-cardBorder text-neko-cyan rounded-xl text-xs font-bold hover:bg-neko-card transition-colors">
                             Clear Filters
@@ -460,11 +472,10 @@
             </div>
         </main>
 
-        <!-- CREATE / EDIT TASK MODAL -->
         <div v-if="showTaskModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-            <div class="bg-neko-card rounded-3xl max-w-md w-full p-6 border border-neko-cardBorder shadow-2xl relative">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-display font-bold text-xl text-white flex items-center gap-2">
+            <div class="bg-neko-card rounded-3xl max-w-md w-full p-5 sm:p-6 border border-neko-cardBorder shadow-2xl relative">
+                <div class="flex justify-between items-center mb-5 sm:mb-6">
+                    <h3 class="font-display font-bold text-lg sm:text-xl text-white flex items-center gap-2">
                         <template v-if="isEditing">Edit Task ✏️</template>
                         <template v-else>Create Task 🐾</template>
                     </h3>
@@ -474,15 +485,15 @@
                 <form @submit.prevent="saveTask" class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Task Title *</label>
-                        <input v-model="taskForm.title" type="text" required placeholder="e.g. Finish project submission 🚀" class="w-full px-4 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-sm text-white focus:outline-none focus:border-neko-pink">
+                        <input v-model="taskForm.title" type="text" required placeholder="e.g. Finish project submission 🚀" class="w-full px-4 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-xs sm:text-sm text-white focus:outline-none focus:border-neko-pink">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Description</label>
-                        <textarea v-model="taskForm.description" rows="2" placeholder="Optional notes or details..." class="w-full px-4 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-sm text-white focus:outline-none focus:border-neko-pink"></textarea>
+                        <textarea v-model="taskForm.description" rows="2" placeholder="Optional notes or details..." class="w-full px-4 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-xs sm:text-sm text-white focus:outline-none focus:border-neko-pink"></textarea>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Category</label>
                             <select v-model="taskForm.category" class="w-full px-3 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-xs font-bold text-white focus:outline-none focus:border-neko-pink">
@@ -521,11 +532,10 @@
             </div>
         </div>
 
-        <!-- AUTH MODAL -->
         <div v-if="showAuthModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-            <div class="bg-neko-card rounded-3xl max-w-sm w-full p-6 border border-neko-cardBorder shadow-2xl">
-                <div class="flex justify-between items-center mb-5">
-                    <h3 class="font-display font-bold text-xl text-white">
+            <div class="bg-neko-card rounded-3xl max-w-sm w-full p-5 sm:p-6 border border-neko-cardBorder shadow-2xl">
+                <div class="flex justify-between items-center mb-4 sm:mb-5">
+                    <h3 class="font-display font-bold text-lg sm:text-xl text-white">
                         {{ authModalTitle }}
                     </h3>
                     <button @click="showAuthModal = false" class="text-slate-400 hover:text-white">✕</button>
@@ -534,24 +544,24 @@
                 <div v-if="authError" class="mb-4 p-3 bg-neko-pink/20 border border-neko-pink/40 rounded-xl text-xs text-neko-pink font-medium">
                     {{ authError }}
                 </div>
-                <div v-if="authSuccess" class="mb-4 p-3 bg-neko-mint/20 border border-neko-mint/40 rounded-xl text-xs text-neko-mint font-medium">
+                <div v-if="authSuccess" class="mb-4 p-3 bg-neko-mint/20 border border-neko-mint/40 rounded-xl text-xs text-neko-mint font-medium leading-relaxed">
                     {{ authSuccess }}
                 </div>
 
                 <form @submit.prevent="handleAuth" class="space-y-3">
                     <div v-if="authMode === 'signup'">
                         <label class="block text-xs font-bold text-slate-400 mb-1">Full Name</label>
-                        <input v-model="authForm.name" type="text" required class="w-full px-3.5 py-2 rounded-xl bg-neko-bg border border-neko-cardBorder text-sm text-white focus:outline-none focus:border-neko-cyan">
+                        <input v-model="authForm.name" type="text" required class="w-full px-3.5 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-xs sm:text-sm text-white focus:outline-none focus:border-neko-cyan">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-slate-400 mb-1">Email Address</label>
-                        <input v-model="authForm.email" type="email" required class="w-full px-3.5 py-2 rounded-xl bg-neko-bg border border-neko-cardBorder text-sm text-white focus:outline-none focus:border-neko-cyan">
+                        <input v-model="authForm.email" type="email" required class="w-full px-3.5 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-xs sm:text-sm text-white focus:outline-none focus:border-neko-cyan">
                     </div>
 
                     <div v-if="authMode !== 'reset'">
                         <label class="block text-xs font-bold text-slate-400 mb-1">Password</label>
-                        <input v-model="authForm.password" type="password" required class="w-full px-3.5 py-2 rounded-xl bg-neko-bg border border-neko-cardBorder text-sm text-white focus:outline-none focus:border-neko-cyan">
+                        <input v-model="authForm.password" type="password" required class="w-full px-3.5 py-2.5 rounded-xl bg-neko-bg border border-neko-cardBorder text-xs sm:text-sm text-white focus:outline-none focus:border-neko-cyan">
                     </div>
 
                     <button type="submit" :disabled="authLoading" class="w-full py-2.5 mt-2 rounded-xl bg-gradient-to-r from-neko-pink to-neko-purple text-white font-extrabold text-xs uppercase tracking-wider shadow-neon-pink hover:opacity-90 transition-all flex items-center justify-center gap-2">
@@ -577,11 +587,9 @@
 
     </div>
 
-    <!-- MAIN APP SCRIPT WITH ES MODULE SUPPORT -->
     <script type="module">
         const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
-        // Embedded Supabase Project Defaults
         const DEFAULT_SUPABASE_URL = 'https://djpkykmzhnvblzpofazo.supabase.co';
         const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable__OSrM6dBasHqlZGcFMADrw_uZzTbo_4';
 
@@ -616,7 +624,6 @@
                     return false;
                 };
 
-                // Audio Synthesizers
                 const initAudio = async () => {
                     if (window.Tone && Tone.context.state !== 'running') {
                         await Tone.start();
@@ -710,7 +717,6 @@
                     setTimeout(() => { isMeowing.value = false; }, 500);
                 };
 
-                // Application State
                 const tasks = ref([]);
                 const currentUser = ref(null);
                 
@@ -720,7 +726,6 @@
                 const filterPriority = ref('All');
                 const catHover = ref(false);
 
-                // Modals
                 const showTaskModal = ref(false);
                 const isEditing = ref(false);
                 const currentEditingId = ref(null);
@@ -747,7 +752,6 @@
                     });
                 };
 
-                // Computed Auth Titles
                 const authModalTitle = computed(() => {
                     if (authMode.value === 'signin') return 'Sign In 🐾';
                     if (authMode.value === 'signup') return 'Create Account 🎀';
@@ -768,7 +772,6 @@
                     return userName.value.charAt(0).toUpperCase();
                 });
 
-                // Fetch Tasks
                 const fetchTasks = async () => {
                     if (!supabase || !currentUser.value) return;
                     loading.value = true;
@@ -814,7 +817,6 @@
                     refreshIcons();
                 });
 
-                // Computed Stats
                 const totalCount = computed(() => tasks.value.length);
                 const completedCount = computed(() => tasks.value.filter(t => t.completed).length);
                 const urgentCount = computed(() => tasks.value.filter(t => t.priority === 'Urgent 🔥' && !t.completed).length);
@@ -824,7 +826,6 @@
                     return Math.round((completedCount.value / totalCount.value) * 100);
                 });
 
-                // Mascot Mood Reaction
                 const catMood = computed(() => {
                     if (catHover.value) {
                         return { type: 'curious', badge: 'Curious 😼', quote: 'Purrr... inspecting your task!' };
@@ -840,7 +841,6 @@
                     return { type: 'napping', badge: 'Napping Cat 😴', quote: 'Zzz... waiting for tasks!' };
                 });
 
-                // Filter Tasks
                 const filteredTasks = computed(() => {
                     return tasks.value.filter(task => {
                         const matchesSearch = task.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
@@ -859,7 +859,6 @@
                     });
                 });
 
-                // Task Operations
                 const toggleTaskComplete = async (task, event) => {
                     const newStatus = !task.completed;
                     task.completed = newStatus;
@@ -967,7 +966,6 @@
                     filterPriority.value = 'All';
                 };
 
-                // Helpers
                 const getCategoryIcon = (category) => {
                     const found = categories.find(c => c.name === category);
                     return found ? found.icon : '🏷️';
@@ -995,7 +993,6 @@
                     return due < today;
                 };
 
-                // Auth Operations
                 const openAuthModal = (mode) => {
                     authMode.value = mode;
                     authError.value = '';
@@ -1012,7 +1009,7 @@
 
                 const handleAuth = async () => {
                     if (!supabase) {
-                        authError.value = 'Supabase client is not initialized. Please check your project settings.';
+                        authError.value = 'Supabase client is not initialized.';
                         return;
                     }
 
@@ -1030,7 +1027,7 @@
                                 }
                             });
                             if (error) throw error;
-                            authSuccess.value = 'Account created successfully! You can now sign in.';
+                            authSuccess.value = 'Account created successfully! Please check your email to confirm your account before signing in.';
                         } else if (authMode.value === 'signin') {
                             const { data, error } = await supabase.auth.signInWithPassword({
                                 email: authForm.value.email,
