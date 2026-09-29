@@ -237,13 +237,13 @@
         <!-- MAIN APP CONTENT (ONLY WHEN LOGGED IN) -->
         <main v-if="currentUser" class="space-y-8">
 
-            <!-- NEON LINE-ART CAT HERO BANNER -->
+            <!-- NEON OUTLINE CAT HERO BANNER (NO EARS, NO LEGS, ROUND CIRCLE WITH TAIL & WHISKERS) -->
             <div class="relative bg-gradient-to-r from-neko-card via-neko-card to-neko-bg rounded-3xl p-6 sm:p-8 border border-neko-cardBorder shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                 
                 <div class="absolute -top-10 -right-10 w-56 h-56 bg-neko-cyan/15 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute -bottom-10 -left-10 w-56 h-56 bg-neko-pink/15 rounded-full blur-3xl pointer-events-none"></div>
 
-                <!-- Left Column: Simple Outline Circle Mascot (No Ears, No Legs) -->
+                <!-- Left Column: Minimalist Circle Cat Mascot (No Ears, No Legs) -->
                 <div class="md:col-span-5 flex flex-col items-center justify-center relative min-h-[220px]">
                     <div class="animate-float relative group cursor-pointer" @click="handleCatClick($event)" @mouseenter="catHover = true" @mouseleave="catHover = false">
                         
@@ -259,13 +259,13 @@
                             PET ME! 🐾
                         </div>
 
-                        <!-- 2D NEON OUTLINE CAT SVG (NO EARS, NO LEGS) -->
+                        <!-- 2D NEON OUTLINE CIRCLE CAT SVG (NO EARS, NO LEGS) -->
                         <svg :class="['w-52 h-52 relative z-10 filter drop-shadow-[0_0_12px_rgba(0,245,255,0.6)] transition-transform', isMeowing ? 'animate-cat-meow' : '']" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                             
                             <!-- Tail -->
                             <path class="animate-tail" d="M 145 150 C 175 145 185 110 165 92 C 150 80 140 100 152 115" stroke="#00F5FF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
                             
-                            <!-- Main Circle Body/Head -->
+                            <!-- Main Circle Head/Body -->
                             <circle cx="100" cy="100" r="50" stroke="#00F5FF" stroke-width="5" stroke-linecap="round" fill="none" />
 
                             <!-- Eyes -->
@@ -284,7 +284,7 @@
                                 <circle cx="122" cy="95" r="4" fill="#FFFFFF" />
                             </g>
 
-                            <!-- Whiskers -->
+                            <!-- Whiskers (Mustache) -->
                             <path d="M 28 98 L 52 101" stroke="#FF2A85" stroke-width="3.5" stroke-linecap="round" />
                             <path d="M 26 108 L 50 107" stroke="#FF2A85" stroke-width="3.5" stroke-linecap="round" />
                             <path d="M 172 98 L 148 101" stroke="#FF2A85" stroke-width="3.5" stroke-linecap="round" />
@@ -581,9 +581,9 @@
     <script type="module">
         const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
-        // Embedded Supabase Project Defaults (Extracted from Anon Token)
+        // Embedded Supabase Project Defaults
         const DEFAULT_SUPABASE_URL = 'https://djpkykmzhnvblzpofazo.supabase.co';
-        const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqcGt5a216aG52Ymx6cG9mYXpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2OTkxMzEsImV4cCI6MjEwNjI3NTEzMX0.ld01V4yfiF0VFlQWmexnT5u1eVA9JYkdR4UiFq8-a7I';
+        const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable__OSrM6dBasHqlZGcFMADrw_uZzTbo_4';
 
         createApp({
             setup() {
@@ -594,45 +594,27 @@
 
                 let supabase = null;
 
-                // Safely read environment variables across static ESM and build tooling with embedded fallbacks
-                const getEnvVar = (key) => {
-                    try {
-                        if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
-                            return import.meta.env[key];
-                        }
-                    } catch (e) {}
-                    try {
-                        if (typeof process !== 'undefined' && process.env && process.env[key]) {
-                            return process.env[key];
-                        }
-                    } catch (e) {}
-                    try {
-                        if (window && window[key]) {
-                            return window[key];
-                        }
-                    } catch (e) {}
-
-                    if (key === 'VITE_SUPABASE_URL') return DEFAULT_SUPABASE_URL;
-                    if (key === 'VITE_SUPABASE_ANON_KEY') return DEFAULT_SUPABASE_ANON_KEY;
-                    return '';
-                };
-
                 const initSupabase = () => {
-                    const url = getEnvVar('VITE_SUPABASE_URL');
-                    const key = getEnvVar('VITE_SUPABASE_ANON_KEY');
-                    
-                    if (window.supabase && url && key) {
-                        try {
+                    let url = DEFAULT_SUPABASE_URL;
+                    let key = DEFAULT_SUPABASE_ANON_KEY;
+
+                    try {
+                        if (typeof import.meta !== 'undefined' && import.meta.env) {
+                            if (import.meta.env.VITE_SUPABASE_URL) url = import.meta.env.VITE_SUPABASE_URL;
+                            if (import.meta.env.VITE_SUPABASE_ANON_KEY) key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+                        }
+                    } catch (e) {}
+
+                    try {
+                        if (window && window.supabase && url && key) {
                             supabase = window.supabase.createClient(url, key);
                             return true;
-                        } catch (e) {
-                            console.error('Failed to init Supabase:', e);
                         }
+                    } catch (e) {
+                        console.error('Failed to init Supabase:', e);
                     }
                     return false;
                 };
-
-                const isSupabaseConfigured = computed(() => !!supabase);
 
                 // Audio Synthesizers
                 const initAudio = async () => {
@@ -1085,7 +1067,7 @@
                     searchQuery, filterStatus, selectedCategory, filterPriority, catHover,
                     soundEnabled, isMeowing, toggleSound, handleCatClick,
                     showTaskModal, isEditing, taskForm, openTaskModal, saveTask, deleteTask, resetFilters,
-                    showAuthModal, isSupabaseConfigured,
+                    showAuthModal,
                     authMode, authForm, authLoading, authError, authSuccess, authModalTitle, authSubmitLabel,
                     openAuthModal, switchAuthMode, handleAuth, logout,
                     userName, userInitial,
